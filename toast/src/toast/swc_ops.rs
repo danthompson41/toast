@@ -27,7 +27,7 @@ pub fn compile_js_for_browser(
     filename: String,
     npm_bin_dir: PathBuf,
     import_map: ImportMap,
-) -> String {
+) -> Result<String, anyhow::Error> {
     let opts = &get_opts();
     let cm = Arc::<SourceMap>::default();
     let handler = Arc::new(Handler::with_tty_emitter(
@@ -49,9 +49,9 @@ pub fn compile_js_for_browser(
         })
     });
     let result = compiler.transform(
-        post_transform_program.unwrap(),
+        post_transform_program?,
         false,
-        built_config.unwrap().pass,
+        built_config?.pass,
     );
     // .and_then(|program| {
     //     if let Program::Module(mut module) = program {
@@ -70,7 +70,7 @@ pub fn compile_js_for_browser(
 
     let output = compiler.print(&result, SourceMapsConfig::default(), None, false);
 
-    output.unwrap().code
+    Ok(output?.code)
 }
 
 #[instrument]

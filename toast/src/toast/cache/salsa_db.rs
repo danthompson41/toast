@@ -14,7 +14,7 @@ pub trait Files: salsa::Database {
 
     // compile js for targets
     fn js_for_browser(&self, key: String, npm_bin_dir: PathBuf, import_map: ImportMap) -> String;
-    fn js_for_server(&self, key: String, npm_bin_dir: PathBuf) -> String;
+    fn js_for_server(&self, key: String, npm_bin_dir: PathBuf) -> Result<String, anyhow::Error>;
 
     // not meant to be used by users
     fn read(&self, path: PathBuf) -> String;
@@ -43,7 +43,7 @@ fn js_for_browser(
     key: String,
     npm_bin_dir: PathBuf,
     import_map: ImportMap,
-) -> String {
+) -> Result<String, anyhow::Error> {
     let source_file = db.source(key.to_string());
     compile_js_for_browser(source_file.source.clone(), key, npm_bin_dir, import_map)
 }
